@@ -1,0 +1,23 @@
+version: "3.9"
+
+services:
+  server:
+    build:
+      context: .
+      target: runtime
+    ports:
+      - "8080:8080"
+
+  client:
+    build:
+      context: .
+      target: runtime
+      network: host
+    command: ["client"]
+    environment:
+      # set to the ip4 address where wsl 2 was running at the time I ran this successfully (ip -4 addr show eth0). calling ping host.docker.internal
+      # from within the container seems to resolve to a port where the server is not running (when I run the server on wsl2 locally).
+      # it seems to be that the host.docker.internal mapping can go out of sync with the nameserver in wsl's /etc/resolv.conf.
+      # when that happens, you can no longer specify the former. You need to specify the latter. restarting docker and wsl can sometimes fix the mapping
+      # as well as restarting your machine.
+      PING_PONG_ADDR: http://172.25.95.191:8080
